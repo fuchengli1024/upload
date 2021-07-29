@@ -1,0 +1,141 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+paths:
+  /v1/scheduler/triggers:
+    get:
+      tags:
+      - trigger-controller
+      operationId: getAllTriggers
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+    post:
+      tags:
+      - trigger-controller
+      operationId: addTrigger
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Trigger'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /v1/scheduler/jobs:
+    get:
+      tags:
+      - job-controller
+      operationId: findJobs
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Job'
+  /v1/scheduler/triggers/{triggerGroup}/{triggerName}:
+    delete:
+      tags:
+      - trigger-controller
+      operationId: deleteTrigger
+      parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: group
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+components:
+  schemas:
+    Trigger:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        group:
+          type: string
+        description:
+          type: string
+        jobName:
+          type: string
+        jobGroup:
+          type: string
+        type:
+          type: string
+          enum:
+          - cron
+          - simple
+        cronExpression:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        interval:
+          type: integer
+          format: int64
+        repeatCount:
+          type: integer
+          format: int32
+    Job:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        group:
+          type: string
+        isDurable:
+          type: boolean
+        description:
+          type: string
+        type:
+          type: string
+          enum:
+          - jms
+          - restApi
+        status:
+          type: string
+          enum:
+          - active
+          - paused
+        jobDataMap:
+          type: object
+          additionalProperties:
+            type: string
+        triggers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Trigger'
